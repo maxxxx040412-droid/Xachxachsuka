@@ -8,7 +8,7 @@ from aiogram.fsm.state import State, StatesGroup
 ADMIN_ID = 5250617443  
 
 # Вставь сюда токен твоего бота, полученный от BotFather
-TOKEN = "912096033:AAHg-JbERYt79LY69pxNjTaKMmIYNoCexo"  [cite: 13]
+TOKEN = "912096033:AAHg-JbERYt79LY69pxNjTaKMmIYNoCexo"
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher()
