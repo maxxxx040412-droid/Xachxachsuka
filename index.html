@@ -25,6 +25,25 @@
             opacity: 0.6;
             margin-bottom: 16px;
         }
+        /* Блок профиля и инвентаря на сайте */
+        .profile-box {
+            background: var(--tg-theme-secondary-bg-color, #242f3d);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 14px;
+        }
+        .profile-box h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: #2ea6ff;
+        }
+        .inventory-list {
+            margin: 6px 0 0 0;
+            padding-left: 18px;
+            opacity: 0.9;
+        }
         .scooter-card {
             background: var(--tg-theme-secondary-bg-color, #242f3d);
             border-radius: 12px;
@@ -101,7 +120,15 @@
 
     <h1>🎮 Scooter Market</h1>
     <div class="game-disclaimer">Вымышленный игровой транспорт и характеристики</div>
-    <div id="user-info" style="text-align: center; margin-bottom: 16px; font-size: 14px; opacity: 0.8;"></div>
+    
+    <!-- Панель игрока и его гаража -->
+    <div class="profile-box">
+        <div id="user-info" style="font-weight: bold; margin-bottom: 6px;">Загрузка профиля...</div>
+        <h3>🎒 Твой гараж (Инвентарь):</h3>
+        <ul id="inventory-container" class="inventory-list">
+            <li>Загружаем владения...</li>
+        </ul>
+    </div>
 
     <!-- Класс: Самокат Обыкновенный 1 -->
     <div class="scooter-card">
@@ -170,8 +197,11 @@
         tg.expand();
 
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            document.getElementById('user-info').innerText = 
-                `Игрок: ${tg.initDataUnsafe.user.first_name} | Выбирай игровой транспорт 👇`;
+            const user = tg.initDataUnsafe.user;
+            document.getElementById('user-info').innerText = `Игрок: ${user.first_name} | Твои владения 👇`;
+            
+            // Здесь можно подтянуть инвентарь (пока показываем заглушку, если бэкенд отдает список)
+            document.getElementById('inventory-container').innerHTML = `<li>Транспорт из покупок будет отображаться здесь после успешной сделки!</li>`;
         }
 
         function buyItem(title, price) {
