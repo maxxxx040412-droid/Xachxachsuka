@@ -13,8 +13,8 @@ from aiogram.types import (
     InlineKeyboardButton,
 )
 
-TOKEN = "9120960363:AAFtaPzLh9OC4qG6MB3nn3U2V5ewd2T5Ass9120960363:AAFtaPzLh9OC4qG6MB3nn3U2V5ewd2T5Ass"  # <--- Вставь сюда токен от @BotFather
-ADMIN_ID = 5250617443         # <--- Вставь сюда свой Telegram ID
+TOKEN = "9120960363:AAFtaPzLh9OC4qG6MB3nn3U2V5ewd2T5Ass9120960363:AAFtaPzLh9OC4qG6MB3nn3U2V5ewd2T5Ass"  # Твой токен уже здесь!
+ADMIN_ID = 5250617443         # Твой ADMIN_ID уже здесь!
 WEBAPP_URL = "https://maxxxx040412-droid.github.io/Xachxachsuka/"
 
 bot = Bot(token=TOKEN)
@@ -171,7 +171,7 @@ async def cmd_start(message: Message):
     balance = get_or_create_player(user.id, user.first_name)
     await message.answer(
         f"Здарова, {user.first_name}! 🤝\n"
-        f"💰 Твой стартовый баланс: **{balance:,} шекелей**\n\n"
+        f"💰 Твой баланс: **{balance:,} шекелей**\n\n"
         "Жми кнопку **«🛵 Открыть Scooter Market»** внизу экрана, чтобы зайти в игру, посмотреть свой гараж и доску объявлений!",
         parse_mode="Markdown",
         reply_markup=get_main_keyboard(user.id, user.first_name),
@@ -200,6 +200,47 @@ async def cmd_profile(message: Message):
     )
 
 
+# --- АДМИН-КОМАНДА ДЛЯ НАЧИСЛЕНИЯ ШЕКЕЛЕЙ ---
+@dp.message(Command("add_money"))
+async def cmd_add_money(message: Message):
+    if message.from_user.id != ADMIN_ID:
+        await message.answer("⛔️ Эта команда доступна только админу!")
+        return
+
+    parts = message.text.split()
+    if len(parts) < 2:
+        await message.answer(
+            "⚠️ Использование команды:\n"
+            "`/add_money <сумма>` — начислить себе\n"
+            "или ответь реплаем на сообщение игрока и введи `/add_money <сумма>`",
+            parse_mode="Markdown",
+        )
+        return
+
+    amount = int(parts[1])
+
+    if message.reply_to_message:
+        target_user = message.reply_to_message.from_user
+        get_or_create_player(target_user.id, target_user.first_name)
+        update_player_balance(target_user.id, amount)
+        new_bal = get_or_create_player(target_user.id, target_user.first_name)
+        await message.answer(
+            f"✅ Игроку {target_user.first_name} начислено **{amount:,} шекелей**!\n"
+            f"💰 Новый баланс игрока: **{new_bal:,} шекелей**",
+            parse_mode="Markdown",
+        )
+    else:
+        get_or_create_player(message.from_user.id, message.from_user.first_name)
+        update_player_balance(message.from_user.id, amount)
+        new_bal = get_or_create_player(message.from_user.id, message.from_user.first_name)
+        await message.answer(
+            f"✅ Тебе начислено **{amount:,} шекелей**!\n"
+            f"💰 Твой новый баланс: **{new_bal:,} шекелей**",
+            parse_mode="Markdown",
+            reply_markup=get_main_keyboard(message.from_user.id, message.from_user.first_name),
+        )
+
+
 # --- ОБРАБОТКА ДЕЙСТВИЙ ИЗ WEB APP ---
 @dp.message(F.web_app_data)
 async def handle_web_app_data(message: Message):
@@ -208,7 +249,6 @@ async def handle_web_app_data(message: Message):
         data = json.loads(message.web_app_data.data)
         action = data.get("action")
 
-        # 1. Покупка в официальном магазине
         if action == "buy_game_item":
             item_title = data.get("item")
             price = int(data.get("price"))
@@ -234,7 +274,6 @@ async def handle_web_app_data(message: Message):
                 reply_markup=get_main_keyboard(user.id, user.first_name),
             )
 
-        # 2. Выставление лота на модерацию
         elif action == "sell_ad":
             item_title = data.get("item")
             price = int(data.get("price"))
@@ -286,7 +325,6 @@ async def handle_web_app_data(message: Message):
                 reply_markup=admin_kb,
             )
 
-        # 3. Покупка чужого лота с доски объявлений
         elif action == "buy_user_ad":
             ad_id = int(data.get("ad_id"))
             conn = sqlite3.connect("game.db")
@@ -355,7 +393,7 @@ async def handle_web_app_data(message: Message):
         await message.answer("⚠️ Ошибка обработки действия.")
 
 
-# --- МОДЕРАЦИЯ АДМИНОМ ---
+# --- МОДЕРАЦИЯ ОБЪЯВЛЕНИЙ АДМИНОМ ---
 @dp.callback_query(F.data.startswith("ad_"))
 async def moderate_ad(callback: types.CallbackQuery):
     if callback.from_user.id != ADMIN_ID:
