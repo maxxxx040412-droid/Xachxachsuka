@@ -13,8 +13,8 @@ from aiogram.types import (
     InlineKeyboardButton,
 )
 
-TOKEN = "ТОКЕН_ТВОЕГО_БОТА"  # <--- Вставь сюда токен своего бота от @BotFather
-ADMIN_ID = 123456789         # <--- Вставь сюда свой Telegram ID
+TOKEN = "9120960363:AAFtaPzLh9OC4qG6MB3nn3U2V5ewd2T5Ass9120960363:AAFtaPzLh9OC4qG6MB3nn3U2V5ewd2T5Ass"  # <--- Вставь сюда токен от @BotFather
+ADMIN_ID = 5250617443         # <--- Вставь сюда свой Telegram ID
 WEBAPP_URL = "https://maxxxx040412-droid.github.io/Xachxachsuka/"
 
 bot = Bot(token=TOKEN)
@@ -60,7 +60,7 @@ def get_or_create_player(user_id: int, username: str) -> int:
     cursor.execute("SELECT balance FROM players WHERE user_id = ?", (user_id,))
     row = cursor.fetchone()
     if row is None:
-        default_balance = 10000  # Старт: 10 000 шекелей для новых игроков
+        default_balance = 10000  # Стартовый баланс 10 000 шекелей
         cursor.execute(
             "INSERT INTO players (user_id, username, balance) VALUES (?, ?, ?)",
             (user_id, username, default_balance),
@@ -134,7 +134,7 @@ def get_active_ads():
     return rows
 
 
-# --- ГЕНЕРАЦИЯ КЛАВИАТУРЫ С ПЕРЕДАЧЕЙ ДАННЫХ В WEBAPP ---
+# --- КЛАВИАТУРА И ПЕРЕДАЧА ДАННЫХ В WEBAPP ---
 def get_main_keyboard(user_id: int, username: str) -> ReplyKeyboardMarkup:
     balance = get_or_create_player(user_id, username)
     inv = [item[0] for item in get_player_inventory(user_id)]
@@ -405,7 +405,6 @@ async def moderate_ad(callback: types.CallbackQuery):
         )
         conn.commit()
         conn.close()
-        # Возвращаем самокат продавцу в инвентарь
         add_to_inventory(seller_id, item_title, price)
         await callback.message.edit_text(
             f"❌ Лот **{item_title}** от {seller_name} отклонен. Самокат возвращен в гараж.",
