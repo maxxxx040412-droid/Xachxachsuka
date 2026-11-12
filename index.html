@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scooter Market</title>
+    <!-- Официальный скрипт Telegram Web App -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            margin: 0;
+            padding: 16px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .scooter-card {
+            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .scooter-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            background-color: #ddd;
+        }
+        .scooter-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-top: 4px;
+        }
+        .scooter-price {
+            color: #2ea6ff;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .buy-btn {
+            background-color: var(--tg-theme-button-color, #2481cc);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🛵 Scooter Market</h1>
+    <div id="user-info" style="text-align: center; margin-bottom: 15px; font-size: 14px; opacity: 0.8;"></div>
+
+    <!-- Карточка самоката из твоего чата -->
+    <div class="scooter-card">
+        <img class="scooter-img" src="1f7f2fb3.png" alt="Самокат">
+        <div class="scooter-title">Твой самокат</div>
+        <div>Отличное состояние, готов к поездке</div>
+        <div class="scooter-price">1 500 шекелей</div>
+        <button class="buy-btn" onclick="buyScooter('Самокат', 1500)">Купить</button>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            document.getElementById('user-info').innerText = 
+                `Привет, ${tg.initDataUnsafe.user.first_name}! Выбирай коня 👇`;
+        }
+
+        function buyScooter(title, price) {
+            tg.showAlert(`Ты выбрал: ${title} за ${price} шекелей!`);
+        }
+    </script>
+
+</body>
+</html>
