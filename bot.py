@@ -60,7 +60,7 @@ def get_or_create_player(user_id: int, username: str) -> int:
     cursor.execute("SELECT balance FROM players WHERE user_id = ?", (user_id,))
     row = cursor.fetchone()
     if row is None:
-        default_balance = 10000  # Стартовый баланс 10 000 шекелей
+        default_balance = 10000
         cursor.execute(
             "INSERT INTO players (user_id, username, balance) VALUES (?, ?, ?)",
             (user_id, username, default_balance),
@@ -217,7 +217,11 @@ async def cmd_add_money(message: Message):
         )
         return
 
-    amount = int(parts[1])
+    try:
+        amount = int(parts[1])
+    except ValueError:
+        await message.answer("⚠️ Сумма должна быть числом.")
+        return
 
     if message.reply_to_message:
         target_user = message.reply_to_message.from_user
@@ -246,12 +250,31 @@ async def cmd_add_money(message: Message):
 async def handle_web_app_data(message: Message):
     user = message.from_user
     try:
-        data = json.loads(message.web_app_data.data)
+        raw = message.web_app_data.data
+        logging.info(f"WebApp data: {raw!r}")
+
+        if not raw:
+            await message.answer("⚠️ Пустые данные из WebApp.")
+            return
+
+        data = json.loads(raw)
         action = data.get("action")
+        logging.info(f"WebApp action: {action}")
 
         if action == "buy_game_item":
             item_title = data.get("item")
-            price = int(data.get("price"))
+            price_raw = data.get("price")
+
+            if not item_title or price_raw is None:
+                await message.answer("⚠️ Некорректные данные товара.")
+                return
+
+            try:
+                price = int(price_raw)
+            except (ValueError, TypeError):
+                await message.answer("⚠️ Некорректная цена товара.")
+                return
+
             current_balance = get_or_create_player(user.id, user.first_name)
 
             if current_balance < price:
@@ -276,7 +299,17 @@ async def handle_web_app_data(message: Message):
 
         elif action == "sell_ad":
             item_title = data.get("item")
-            price = int(data.get("price"))
+            price_raw = data.get("price")
+
+            if not item_title or price_raw is None:
+                await message.answer("⚠️ Некорректные данные для продажи.")
+                return
+
+            try:
+                price = int(price_raw)
+            except (ValueError, TypeError):
+                await message.answer("⚠️ Некорректная цена.")
+                return
 
             if price < 0:
                 await message.answer("⚠️ Укажи корректную цену!")
@@ -326,7 +359,13 @@ async def handle_web_app_data(message: Message):
             )
 
         elif action == "buy_user_ad":
-            ad_id = int(data.get("ad_id"))
+            ad_id_raw = data.get("ad_id")
+            try:
+                ad_id = int(ad_id_raw)
+            except (ValueError, TypeError):
+                await message.answer("⚠️ Некорректный ID объявления.")
+                return
+
             conn = sqlite3.connect("game.db")
             cursor = conn.cursor()
             cursor.execute(
@@ -389,8 +428,11 @@ async def handle_web_app_data(message: Message):
             except Exception:
                 pass
 
+        else:
+            await message.answer(f"⚠️ Неизвестное действие: {action}")
+
     except Exception as e:
-        logging.error(f"Ошибка WebApp: {e}")
+        logging.error(f"Ошибка WebApp: {e}", exc_info=True)
         await message.answer("⚠️ Ошибка обработки действия.")
 
 
