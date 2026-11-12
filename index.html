@@ -3,281 +3,356 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scooter Market — Игровой магазин</title>
+    <title>Scooter Market</title>
+    <!-- Подключаем Telegram Web App скрипт -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--tg-theme-bg-color, #18222d);
-            color: var(--tg-theme-text-color, #ffffff);
-            margin: 0;
-            padding: 16px;
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+            --success: #22c55e;
         }
-        h1 { text-align: center; font-size: 22px; margin: 0 0 4px 0; }
-        .game-disclaimer { text-align: center; font-size: 12px; opacity: 0.6; margin-bottom: 14px; }
-        .profile-box {
-            background: var(--tg-theme-secondary-bg-color, #242f3d);
-            border-radius: 12px;
-            padding: 14px;
-            margin-bottom: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        header h1 {
+            font-size: 24px;
+            color: var(--accent);
+            margin-bottom: 5px;
+        }
+        header p {
+            color: var(--text-muted);
             font-size: 14px;
         }
-        .balance-row {
-            font-size: 16px;
-            font-weight: bold;
-            color: #2ed573;
-            margin: 6px 0 10px 0;
+        .profile-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
-        .inventory-list { margin: 6px 0 0 0; padding-left: 18px; opacity: 0.95; }
+        .profile-card h2 {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .profile-card p {
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+        .garage-list {
+            list-style: none;
+            margin-top: 8px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+        .garage-list li {
+            background: rgba(255,255,255,0.05);
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
         .tabs {
             display: flex;
-            gap: 8px;
-            margin-bottom: 16px;
+            gap: 10px;
+            margin-bottom: 20px;
         }
         .tab-btn {
             flex: 1;
-            padding: 10px 6px;
+            background: var(--card-bg);
             border: none;
+            color: var(--text-muted);
+            padding: 12px;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 13px;
             cursor: pointer;
-            background: var(--tg-theme-secondary-bg-color, #242f3d);
-            color: var(--tg-theme-text-color, #ffffff);
+            transition: 0.2s;
         }
         .tab-btn.active {
-            background: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
+            background: var(--accent);
+            color: #fff;
         }
-        .section { display: none; }
-        .section.active { display: block; }
-        .scooter-card {
-            background: var(--tg-theme-secondary-bg-color, #242f3d);
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .item-card {
+            background: var(--card-bg);
             border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
         }
-        .scooter-img {
+        .item-card h3 {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .item-card p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+        .btn {
+            background: var(--accent);
+            color: #fff;
+            border: none;
             width: 100%;
-            height: 190px;
-            object-fit: cover;
+            padding: 10px;
             border-radius: 8px;
-            background-color: #131a22;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .scooter-title { font-weight: bold; font-size: 18px; }
-        .scooter-specs { font-size: 13px; opacity: 0.9; line-height: 1.4; }
-        .limit-badge {
-            display: inline-block; background: #ff4757; color: #fff;
-            font-weight: bold; font-size: 11px; padding: 2px 6px; border-radius: 4px; width: fit-content;
+        .btn:hover {
+            background: var(--accent-hover);
         }
-        .common-badge {
-            display: inline-block; background: #2ed573; color: #fff;
-            font-weight: bold; font-size: 11px; padding: 2px 6px; border-radius: 4px; width: fit-content;
+        .form-group {
+            margin-bottom: 15px;
         }
-        .user-badge {
-            display: inline-block; background: #ffa502; color: #000;
-            font-weight: bold; font-size: 11px; padding: 2px 6px; border-radius: 4px; width: fit-content;
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 5px;
         }
-        .scooter-price { color: #2ea6ff; font-weight: bold; font-size: 17px; }
-        .buy-btn {
-            background-color: var(--tg-theme-button-color, #2481cc);
-            color: var(--tg-theme-button-text-color, #ffffff);
-            border: none; border-radius: 8px; padding: 12px;
-            font-size: 15px; font-weight: bold; cursor: pointer; margin-top: 4px;
-        }
-        .buy-btn:active { opacity: 0.8; }
-        select, input {
-            width: 100%; box-sizing: border-box; padding: 10px;
-            border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);
-            background: #131a22; color: #fff; font-size: 15px; margin-top: 6px;
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
 
-    <h1>🎮 Scooter Market</h1>
-    <div class="game-disclaimer">Игровой маркетплейс перекупов</div>
+    <header>
+        <h1>🛵 Scooter Market</h1>
+        <p>Игровой маркетплейс перекупов</p>
+    </header>
 
-    <!-- Профиль, Баланс и Инвентарь -->
-    <div class="profile-box">
-        <div id="user-info" style="font-weight: bold;">Игрок</div>
-        <div class="balance-row" id="user-balance">💰 Баланс: загрузка...</div>
-        <div style="font-weight: bold; color: #2ea6ff;">🎒 Твой гараж:</div>
-        <ul id="inventory-container" class="inventory-list"></ul>
+    <!-- Профиль и Гараж -->
+    <div class="profile-card">
+        <h2 id="username">👤 Игрок: Перекуп</h2>
+        <p>💵 Баланс: <strong id="balance">0</strong> шекелей</p>
+        <p>🎒 Твой гараж:</p>
+        <ul id="garage-list" class="garage-list">
+            <li>Гараж пуст — купи что-нибудь в магазине!</li>
+        </ul>
     </div>
 
-    <!-- Вкладки навигации -->
+    <!-- Навигация (Тэбы) -->
     <div class="tabs">
-        <button class="tab-btn active" onclick="switchTab('shop', this)">🏪 Магазин</button>
-        <button class="tab-btn" onclick="switchTab('board', this)">📋 Доска игроков</button>
-        <button class="tab-btn" onclick="switchTab('sell', this)">➕ Выставить</button>
+        <button class="tab-btn active" onclick="switchTab('shop')">🛒 Магазин</button>
+        <button class="tab-btn" onclick="switchTab('marketplace')">📋 Доска игроков</button>
+        <button class="tab-btn" onclick="switchTab('sell')">➕ Выставить</button>
     </div>
 
-    <!-- ВКЛАДКА 1: МАГАЗИН -->
-    <div id="tab-shop" class="section active">
-        <div class="scooter-card">
-            <img class="scooter-img" src="Тесла паркинг т3.png" alt="Kukirin t3">
-            <span class="common-badge">🟢 САМОКАТ ОБЫКНОВЕННЫЙ</span>
-            <div class="scooter-title">Kukirin t3</div>
-            <div class="scooter-specs">⚡️ Игровые Max speed 45 km/h / Самокат Обыкновенный!</div>
-            <div class="scooter-price">5 000 шекелей</div>
-            <button class="buy-btn" onclick="buyItem('Kukirin t3', 5000)">Приобрести</button>
+    <!-- Вкладка 1: Магазин -->
+    <div id="shop" class="tab-content active">
+        <div class="item-card">
+            <h3>Kukirin t3</h3>
+            <p>⚡️ Игровые Max speed 45 km/h / Самокат Обыкновенный!</p>
+            <p><strong>Цена: 5 000 шекелей</strong></p>
+            <button class="btn" onclick="buyItem('Kukirin t3', 5000)">Приобрести</button>
         </div>
-
-        <div class="scooter-card">
-            <img class="scooter-img" src="Kukirin G2 MAX.png" alt="Kukirin g2 max">
-            <span class="common-badge">🟢 САМОКАТ ОБЫКНОВЕННЫЙ</span>
-            <div class="scooter-title">Kukirin g2 max</div>
-            <div class="scooter-specs">⚡️ Игровые Max speed 55 km/h / Самокат как самокат ничем не выделяется от остальных!</div>
-            <div class="scooter-price">8 000 шекелей</div>
-            <button class="buy-btn" onclick="buyItem('Kukirin g2 max', 8000)">Приобрести</button>
+        <div class="item-card">
+            <h3>Kukirin g2 max</h3>
+            <p>⚡️ Игровые Max speed 55 km/h / Самокат как самокат ничем не выделяется от остальных!</p>
+            <p><strong>Цена: 8 000 шекелей</strong></p>
+            <button class="btn" onclick="buyItem('Kukirin g2 max', 8000)">Приобрести</button>
         </div>
-
-        <div class="scooter-card">
-            <img class="scooter-img" src="Ninebor G2 MAX.png" alt="ninebot g2 max">
-            <span class="common-badge">🟢 САМОКАТ ОБЫКНОВЕННЫЙ</span>
-            <div class="scooter-title">ninebot g2 max</div>
-            <div class="scooter-specs">⚡️ Игровые Max speed 25 km/h / Первый представитель компании Segway Ninebot в игре!</div>
-            <div class="scooter-price">10 000 шекелей</div>
-            <button class="buy-btn" onclick="buyItem('ninebot g2 max', 10000)">Приобрести</button>
-        </div>
-
-        <div class="scooter-card">
-            <img class="scooter-img" src="Sanya SST.jpg" alt="Kugoo g2 pro (2020) SST">
-            <span class="limit-badge">🔥 ИГРОВАЯ ЛИМИТКА</span>
-            <div class="scooter-title">Kugoo g2 pro (2020) SST</div>
-            <div class="scooter-specs">⚡️ Игровая скорость: до 110 км/ч<br>🛠 Кастомный игровой проект Сани стантера!</div>
-            <div class="scooter-price">100 000 шекелей</div>
-            <button class="buy-btn" onclick="buyItem('Kugoo g2 pro (2020) SST', 100000)">Приобрести в инвентарь</button>
-        </div>
-
-        <div class="scooter-card">
-            <img class="scooter-img" src="MOGG4.jpg" alt="Kugoo MOGG 4 pro">
-            <span class="limit-badge">🔥 ИГРОВАЯ ЛИМИТКА</span>
-            <div class="scooter-title">Kugoo MOGG 4 pro</div>
-            <div class="scooter-specs">⚡️ Игровая скорость: до 90 км/ч (кастом проект на базе взорваного чепыря)<br>🛠 Вымышленный игровой концепт-проект!</div>
-            <div class="scooter-price">1 000 000 шекелей</div>
-            <button class="buy-btn" onclick="buyItem('Kugoo MOGG4 pro', 1000000)">Приобрести в инвентарь</button>
+        <div class="item-card">
+            <h3>Ninebot g2 max</h3>
+            <p>⚡️ Легендарный аппарат с подвеской!</p>
+            <p><strong>Цена: 12 000 шекелей</strong></p>
+            <button class="btn" onclick="buyItem('Ninebot g2 max', 12000)">Приобрести</button>
         </div>
     </div>
 
-    <!-- ВКЛАДКА 2: ДОСКА ОБЪЯВЛЕНИЙ ИГРОКОВ -->
-    <div id="tab-board" class="section">
-        <div id="ads-container"></div>
+    <!-- Вкладка 2: Доска объявлений (P2P) -->
+    <div id="marketplace" class="tab-content">
+        <div id="ads-container">
+            <p style="color: var(--text-muted); text-align: center;">Активных объявлений пока нет.</p>
+        </div>
     </div>
 
-    <!-- ВКЛАДКА 3: ПРОДАТЬ СВОЙ САМОКАТ -->
-    <div id="tab-sell" class="section">
-        <div class="scooter-card">
-            <div class="scooter-title">📢 Выставить свой лот</div>
-            <div class="scooter-specs">Выбери транспорт из своего гаража и укажи цену. После одобрения админом лот появится на доске объявлений.</div>
-            <label style="font-size: 13px; margin-top: 8px;">Транспорт из гаража:</label>
-            <select id="sell-select"></select>
-            <label style="font-size: 13px; margin-top: 8px;">Твоя цена (в шекелях):</label>
-            <input type="number" id="sell-price" placeholder="Например: 12000" min="1">
-            <button class="buy-btn" onclick="submitAd()">Отправить на модерацию</button>
+    <!-- Вкладка 3: Выставить на продажу -->
+    <div id="sell" class="tab-content">
+        <div class="profile-card">
+            <h2>Выставить самокат на доску</h2>
+            <div class="form-group" style="margin-top: 10px;">
+                <label for="sell-item-select">Выбери аппарат из гаража:</label>
+                <select id="sell-item-select">
+                    <!-- Заполняется динамически -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="sell-price-input">Цена продажи (в шекелях):</label>
+                <input type="number" id="sell-price-input" placeholder="Например: 7000">
+            </div>
+            <button class="btn" onclick="submitAd()">Отправить на модерацию админу</button>
         </div>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
+        tg.ready();
         tg.expand();
 
-        // Читаем данные, которые бот передал в URL
+        // Считываем параметры из URL (их передает бот)
         const urlParams = new URLSearchParams(window.location.search);
-        const balance = Number(urlParams.get('bal') || 0);
+        let balance = parseInt(urlParams.get('bal')) || 0;
         let inventory = [];
-        let ads = [];
+        let activeAds = [];
 
-        try { inventory = JSON.parse(urlParams.get('inv') || '[]'); } catch (e) {}
-        try { ads = JSON.parse(urlParams.get('ads') || '[]'); } catch (e) {}
+        try {
+            const invParam = urlParams.get('inv');
+            if (invParam) inventory = JSON.parse(invParam);
+        } catch (e) { inventory = []; }
 
-        // Отображаем имя и баланс
-        const userName = (tg.initDataUnsafe && tg.initDataUnsafe.user)
-            ? tg.initDataUnsafe.user.first_name
-            : 'Перекуп';
-        document.getElementById('user-info').innerText = `👤 Игрок: ${userName}`;
-        document.getElementById('user-balance').innerText = `💰 Баланс: ${balance.toLocaleString('ru-RU')} шекелей`;
+        try {
+            const adsParam = urlParams.get('ads');
+            if (adsParam) activeAds = JSON.parse(adsParam);
+        } catch (e) { activeAds = []; }
 
-        // Отображаем инвентарь и заполняем список продажи
-        const invContainer = document.getElementById('inventory-container');
-        const sellSelect = document.getElementById('sell-select');
-
-        if (inventory.length === 0) {
-            invContainer.innerHTML = '<li>Гараж пуст — купи что-нибудь в магазине!</li>';
-            sellSelect.innerHTML = '<option value="">В гараже ничего нет</option>';
-        } else {
-            invContainer.innerHTML = inventory.map(item => `<li>${item}</li>`).join('');
-            const uniqueItems = [...new Set(inventory)];
-            sellSelect.innerHTML = uniqueItems.map(item => `<option value="${item}">${item}</option>`).join('');
+        // Инициализация интерфейса
+        document.getElementById('balance').innerText = balance.toLocaleString();
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+            document.getElementById('username').innerText = `👤 Игрок: ${tg.initDataUnsafe.user.first_name}`;
         }
 
-        // Отображаем доску объявлений игроков
-        const adsContainer = document.getElementById('ads-container');
-        if (ads.length === 0) {
-            adsContainer.innerHTML = '<div class="scooter-card">Пока нет активных объявлений от игроков. Будь первым!</div>';
-        } else {
-            adsContainer.innerHTML = ads.map(ad => `
-                <div class="scooter-card">
-                    <span class="user-badge">🤝 ОТ ИГРОКА: ${ad.seller}</span>
-                    <div class="scooter-title">${ad.item}</div>
-                    <div class="scooter-price">${Number(ad.price).toLocaleString('ru-RU')} шекелей</div>
-                    <button class="buy-btn" onclick="buyUserAd(${ad.id}, '${ad.item}', ${ad.price})">Купить у игрока</button>
-                </div>
-            `).join('');
+        // Отрисовка гаража
+        function renderGarage() {
+            const garageList = document.getElementById('garage-list');
+            const selectEl = document.getElementById('sell-item-select');
+            
+            garageList.innerHTML = '';
+            selectEl.innerHTML = '';
+
+            if (inventory.length === 0) {
+                garageList.innerHTML = '<li>Гараж пуст — купи что-нибудь в магазине!</li>';
+                selectEl.innerHTML = '<option value="">Нет транспорта в гараже</option>';
+                return;
+            }
+
+            inventory.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.innerText = `🛵 ${item}`;
+                garageList.appendChild(li);
+
+                const option = document.createElement('option');
+                option.value = item;
+                option.innerText = item;
+                selectEl.appendChild(option);
+            });
         }
 
-        function switchTab(tabName, btn) {
-            document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+        // Отрисовка доски объявлений
+        function renderAds() {
+            const container = document.getElementById('ads-container');
+            container.innerHTML = '';
+
+            if (activeAds.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">Активных объявлений пока нет.</p>';
+                return;
+            }
+
+            activeAds.forEach(ad => {
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.innerHTML = `
+                    <h3>🛵 ${ad.item}</h3>
+                    <p>👤 Продавец: ${ad.seller}</p>
+                    <p><strong>💵 Цена: ${ad.price.toLocaleString()} шекелей</strong></p>
+                    <button class="btn" onclick="buyUserAd(${ad.id})">Купить у игрока</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        renderGarage();
+        renderAds();
+
+        // Переключение вкладок
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('tab-' + tabName).classList.add('active');
-            btn.classList.add('active');
+            
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
         }
 
-        function buyItem(title, price) {
-            tg.showConfirm(`Купить «${title}» за ${price.toLocaleString('ru-RU')} шекелей?`, function(confirmed) {
-                if (confirmed) {
-                    tg.sendData(JSON.stringify({
-                        action: 'buy_game_item',
-                        item: title,
-                        price: price
-                    }));
-                }
-            });
+        // Покупка в оф. магазине
+        function buyItem(itemTitle, price) {
+            if (balance < price) {
+                tg.showAlert(`Недостаточно шекелей! Нужно ${price.toLocaleString()}, у тебя ${balance.toLocaleString()}.`);
+                return;
+            }
+
+            const data = {
+                action: "buy_game_item",
+                item: itemTitle,
+                price: price
+            };
+            tg.sendData(JSON.stringify(data));
+            tg.close();
         }
 
-        function buyUserAd(adId, title, price) {
-            tg.showConfirm(`Купить «${title}» у игрока за ${price.toLocaleString('ru-RU')} шекелей?`, function(confirmed) {
-                if (confirmed) {
-                    tg.sendData(JSON.stringify({
-                        action: 'buy_user_ad',
-                        ad_id: adId
-                    }));
-                }
-            });
-        }
-
+        // Выставление лота на модерацию
         function submitAd() {
-            const item = sellSelect.value;
-            const price = Number(document.getElementById('sell-price').value);
+            const item = document.getElementById('sell-item-select').value;
+            const price = parseInt(document.getElementById('sell-price-input').value);
+
             if (!item) {
-                tg.showAlert('Сначала купи самокат в магазине!');
+                tg.showAlert('У тебя нет транспорта для продажи в гараже!');
                 return;
             }
             if (!price || price <= 0) {
-                tg.showAlert('Укажи нормальную цену в шекелях!');
+                tg.showAlert('Введи корректную цену!');
                 return;
             }
-            tg.sendData(JSON.stringify({
-                action: 'sell_ad',
+
+            const data = {
+                action: "sell_ad",
                 item: item,
                 price: price
-            }));
+            };
+            tg.sendData(JSON.stringify(data));
+            tg.close();
+        }
+
+        // Покупка чужого лота
+        function buyUserAd(adId) {
+            const data = {
+                action: "buy_user_ad",
+                ad_id: adId
+            };
+            tg.sendData(JSON.stringify(data));
+            tg.close();
         }
     </script>
 </body>
