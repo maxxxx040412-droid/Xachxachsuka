@@ -13,8 +13,8 @@ from aiogram.types import (
     InlineKeyboardButton,
 )
 
-TOKEN = "9120960363:AAFtaPzLh9OC4qG6MB3nn3U2V5ewd2T5Ass9120960363:AAFtaPzLh9OC4qG6MB3nn3U2V5ewd2T5Ass"  # Твой токен уже здесь!
-ADMIN_ID = 5250617443         # Твой ADMIN_ID уже здесь!
+TOKEN = "9120960363:AAFtaPzLh9OC4qG6MB3nn3U2V5ewd2T5Ass"  # Твой чистый токен бота
+ADMIN_ID = 5250617443                                    # Твой Telegram ID
 WEBAPP_URL = "https://maxxxx040412-droid.github.io/Xachxachsuka/"
 
 bot = Bot(token=TOKEN)
@@ -278,11 +278,11 @@ async def handle_web_app_data(message: Message):
             item_title = data.get("item")
             price = int(data.get("price"))
 
-            if price <= 0:
+            if price < 0:
                 await message.answer("⚠️ Укажи корректную цену!")
                 return
 
-            if not remove_one_from_inventory(user.id, item_title):
+            if price > 0 and not remove_one_from_inventory(user.id, item_title):
                 await message.answer(
                     f"⚠️ У тебя в гараже нет аппарата «{item_title}»!",
                     reply_markup=get_main_keyboard(user.id, user.first_name),
@@ -368,7 +368,8 @@ async def handle_web_app_data(message: Message):
             conn.close()
 
             update_player_balance(user.id, -price)
-            update_player_balance(seller_id, price)
+            if price > 0:
+                update_player_balance(seller_id, price)
             add_to_inventory(user.id, item_title, price)
 
             await message.answer(
