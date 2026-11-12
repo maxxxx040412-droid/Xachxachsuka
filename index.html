@@ -3,47 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scooter Market</title>
+    <title>Scooter Market — Игровой магазин</title>
     <!-- Официальный скрипт Telegram Web App -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--tg-theme-bg-color, #ffffff);
-            color: var(--tg-theme-text-color, #000000);
+            background-color: var(--tg-theme-bg-color, #18222d);
+            color: var(--tg-theme-text-color, #ffffff);
             margin: 0;
             padding: 16px;
         }
         h1 {
             text-align: center;
             font-size: 24px;
-            margin-bottom: 20px;
+            margin-bottom: 6px;
+        }
+        .game-disclaimer {
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.6;
+            margin-bottom: 16px;
         }
         .scooter-card {
-            background: var(--tg-theme-secondary-bg-color, #f0f0f0);
+            background: var(--tg-theme-secondary-bg-color, #242f3d);
             border-radius: 12px;
             padding: 16px;
             margin-bottom: 16px;
             display: flex;
             flex-direction: column;
             gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
         .scooter-img {
             width: 100%;
             height: 200px;
             object-fit: cover;
             border-radius: 8px;
-            background-color: #ddd;
+            background-color: #131a22;
         }
         .scooter-title {
             font-weight: bold;
-            font-size: 18px;
+            font-size: 19px;
             margin-top: 4px;
+        }
+        .scooter-specs {
+            font-size: 14px;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+        .limit-badge {
+            display: inline-block;
+            background: #ff4757;
+            color: #fff;
+            font-weight: bold;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 4px;
+            width: fit-content;
         }
         .scooter-price {
             color: #2ea6ff;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 18px;
+            margin-top: 4px;
         }
         .buy-btn {
             background-color: var(--tg-theme-button-color, #2481cc);
@@ -52,24 +76,46 @@
             border-radius: 8px;
             padding: 12px;
             font-size: 16px;
+            font-weight: bold;
             cursor: pointer;
             text-align: center;
             margin-top: 8px;
+        }
+        .buy-btn:active {
+            opacity: 0.8;
         }
     </style>
 </head>
 <body>
 
-    <h1>🛵 Scooter Market</h1>
-    <div id="user-info" style="text-align: center; margin-bottom: 15px; font-size: 14px; opacity: 0.8;"></div>
+    <h1>🎮 Scooter Market</h1>
+    <div class="game-disclaimer">Вымышленный игровой транспорт и характеристики</div>
+    <div id="user-info" style="text-align: center; margin-bottom: 16px; font-size: 14px; opacity: 0.8;"></div>
 
-    <!-- Карточка самоката из твоего чата -->
+    <!-- Игровая карточка 1 -->
     <div class="scooter-card">
-        <img class="scooter-img" src="1f7f2fb3.png" alt="Самокат">
-        <div class="scooter-title">Твой самокат</div>
-        <div>Отличное состояние, готов к поездке</div>
-        <div class="scooter-price">1 500 шекелей</div>
-        <button class="buy-btn" onclick="buyScooter('Самокат', 1500)">Купить</button>
+        <img class="scooter-img" src="Sanya SST.jpg" alt="Kugoo g2 pro (2020) SST">
+        <span class="limit-badge">🔥 ИГРОВАЯ ЛИМИТКА</span>
+        <div class="scooter-title">Kugoo g2 pro (2020) SST</div>
+        <div class="scooter-specs">
+            ⚡️ Игровая скорость: до 110 км/ч<br>
+            🛠 Кастомный игровой проект Сани стантера!
+        </div>
+        <div class="scooter-price">100 000 игровых шекелей</div>
+        <button class="buy-btn" onclick="buyItem('Kugoo g2 pro (2020) SST', 100000)">Приобрести в инвентарь</button>
+    </div>
+
+    <!-- Игровая карточка 2 -->
+    <div class="scooter-card">
+        <img class="scooter-img" src="MOGG4.jpg" alt="Kugoo MOGG 4 pro">
+        <span class="limit-badge">🔥 ИГРОВАЯ ЛИМИТКА</span>
+        <div class="scooter-title">Kugoo MOGG 4 pro</div>
+        <div class="scooter-specs">
+            ⚡️ Игровая скорость: до 90 км/ч Кастом проект на базе взорваного чепыря <br>
+            🛠 Вымышленный игровой концепт-проект! 
+        </div>
+        <div class="scooter-price">1 000 000 игровых шекелей</div>
+        <button class="buy-btn" onclick="buyItem('Kugoo MOGG4 pro', 1000000)">Приобрести в инвентарь</button>
     </div>
 
     <script>
@@ -78,11 +124,20 @@
 
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             document.getElementById('user-info').innerText = 
-                `Привет, ${tg.initDataUnsafe.user.first_name}! Выбирай коня 👇`;
+                `Игрок: ${tg.initDataUnsafe.user.first_name} | Выбирай игровой транспорт 👇`;
         }
 
-        function buyScooter(title, price) {
-            tg.showAlert(`Ты выбрал: ${title} за ${price} шекелей!`);
+        function buyItem(title, price) {
+            tg.showConfirm(`Добавить «${title}» в игровой инвентарь за ${price.toLocaleString('ru-RU')} шекелей?`, function(confirmed) {
+                if (confirmed) {
+                    // Отправляем данные о покупке в твоего Python-бота
+                    tg.sendData(JSON.stringify({
+                        action: 'buy_game_item',
+                        item: title,
+                        price: price
+                    }));
+                }
+            });
         }
     </script>
 
