@@ -130,7 +130,7 @@
         function buyItem(title, price) {
             tg.showConfirm(`Добавить «${title}» в игровой инвентарь за ${price.toLocaleString('ru-RU')} шекелей?`, function(confirmed) {
                 if (confirmed) {
-                    // Отправляем данные о покупке в твоего Python-бота
+                    // Отправляем данные о покупке в Python-бота
                     tg.sendData(JSON.stringify({
                         action: 'buy_game_item',
                         item: title,
